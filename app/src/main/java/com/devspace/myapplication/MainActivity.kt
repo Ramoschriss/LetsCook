@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,9 +26,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -93,24 +98,38 @@ fun RecipesSession(
     recipesList: List<RecipesDto>,
     onClick: (RecipesDto) -> Unit
 ) {
-
+    @Composable
+    fun CenteredTitle() {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Let's cook",
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(8.dp),
 
-    ) {
+        ) {
+        CenteredTitle()
 
         Text(
-            fontSize = 24.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             text = label,
         )
         Spacer(modifier = Modifier.size(8.dp))
         RecipesList(recipesList = recipesList, onClick = onClick)
-
     }
-
 }
 
 @Composable
@@ -136,18 +155,33 @@ fun RecipesItem(
 ) {
 
     Column(
-        modifier = Modifier.clickable {
+        modifier = Modifier
+            .width(IntrinsicSize.Min)
+            .clickable {
             onClick.invoke(recipesDto)
         }
     ) {
         AsyncImage(
             modifier = Modifier
                 .padding(end = 6.dp)
-                .width(200.dp)
+                .width(420.dp)
                 .height(150.dp),
             contentScale = ContentScale.Crop,
             model = recipesDto.image,
             contentDescription = "${recipesDto.title} Poster image"
+        )
+        Spacer(modifier = Modifier.size(8.dp))
+        Text(
+            text = recipesDto.title,
+            maxLines = 1,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = recipesDto.summary,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 2,
+            fontWeight = FontWeight.SemiBold,
+            color = Color.Gray
         )
     }
 }
