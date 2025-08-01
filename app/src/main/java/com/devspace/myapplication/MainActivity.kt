@@ -47,31 +47,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LetsCook {
-                var randomRecipes by remember { mutableStateOf<List<RecipesDto>>(emptyList()) }
 
-                val apiService = RetrofitClient.retrofitInstance.create(ApiService::class.java)
-                val callRandom = apiService.getRandom()
 
-                callRandom.enqueue(object : Callback<RecipesResponse> {
-                    override fun onResponse(
-                        call: Call<RecipesResponse>,
-                        response: Response<RecipesResponse>
-                    ) {
-                        if (response.isSuccessful) {
-                            val random = response.body()?.recipes
-                            if (random != null) {
-                                randomRecipes = random
-                            }
-                        } else {
-                            Log.d("MainActivity", "Request Error ::${response.errorBody()}")
-                        }
-                    }
 
-                    override fun onFailure(call: Call<RecipesResponse>, t: Throwable) {
-                        Log.d("MainActivity", "Network Error ::${t.message}")
-                    }
-
-                })
 
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -79,110 +57,12 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    RecipesSession(
-                        label = "Random Recipes",
-                        recipesList = randomRecipes,
-                        onClick = { recipesClicked ->
-                        }
-                    )
-
+                    RecipesApp()
                 }
             }
         }
     }
 }
 
-@Composable
-fun RecipesSession(
-    label: String,
-    recipesList: List<RecipesDto>,
-    onClick: (RecipesDto) -> Unit
-) {
-    @Composable
-    fun CenteredTitle() {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Let's cook",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(8.dp),
 
-        ) {
-        CenteredTitle()
-
-        Text(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            text = label,
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        RecipesList(recipesList = recipesList, onClick = onClick)
-    }
-}
-
-@Composable
-fun RecipesList(
-    recipesList: List<RecipesDto>,
-    onClick: (RecipesDto) -> Unit
-) {
-    LazyColumn {
-        items(recipesList) {
-            RecipesItem(
-                recipesDto = it,
-                onClick = onClick
-            )
-        }
-    }
-}
-
-
-@Composable
-fun RecipesItem(
-    recipesDto: RecipesDto,
-    onClick: (RecipesDto) -> Unit
-) {
-
-    Column(
-        modifier = Modifier
-            .width(IntrinsicSize.Min)
-            .clickable {
-            onClick.invoke(recipesDto)
-        }
-    ) {
-        AsyncImage(
-            modifier = Modifier
-                .padding(end = 6.dp)
-                .width(420.dp)
-                .height(150.dp),
-            contentScale = ContentScale.Crop,
-            model = recipesDto.image,
-            contentDescription = "${recipesDto.title} Poster image"
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        Text(
-            text = recipesDto.title,
-            maxLines = 1,
-            fontWeight = FontWeight.SemiBold,
-        )
-        Text(
-            text = recipesDto.summary,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 2,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Gray
-        )
-    }
-}
 
